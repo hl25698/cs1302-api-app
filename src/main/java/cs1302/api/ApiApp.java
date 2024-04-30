@@ -16,6 +16,10 @@ import java.io.IOException;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,13 +43,16 @@ public class ApiApp extends Application {
     Stage stage;
     Scene scene;
     VBox root;
-
+    TextField queryTermField;
+    HBox searchBar;
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
      * constructor is executed in Step 2 of the JavaFX Application Life-Cycle.
      */
     public ApiApp() {
         root = new VBox();
+        queryTermField = new TextField();
+        searchBar = new HBox();
     } // ApiApp
 
     /** {@inheritDoc} */
@@ -55,7 +62,7 @@ public class ApiApp extends Application {
         this.stage = stage;
 
         // demonstrate how to load local asset using "file:resources/"
-        Image bannerImage = new Image("file:resources/readme-banner.png");
+/**        Image bannerImage = new Image("file:resources/readme-banner.png");
         ImageView banner = new ImageView(bannerImage);
         banner.setPreserveRatio(true);
         banner.setFitWidth(640);
@@ -64,8 +71,10 @@ public class ApiApp extends Application {
         Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        root.getChildren().addAll(banner, notice);
-        scene = new Scene(root);
+        root.getChildren().addAll(searchBar, banner, notice);
+*/
+        this.scene = new Scene(root, 1280, 720);
+        setUp(this.scene);
 
         // setup stage
         stage.setTitle("ApiApp!");
@@ -75,6 +84,16 @@ public class ApiApp extends Application {
         stage.show();
 
     } // start
+
+    public void setUp(Scene scene) {
+        Label title = new Label("Raining Cats and Dogs");
+        searchBar.getChildren().addAll(
+            new Label("Enter your city:"),
+            queryTermField
+        );
+        root.getChildren().addAll(title, searchBar);
+        root.setAlignment(Pos.TOP_CENTER);
+    }
 
     public void getWeather(String city) {
         String url = "http://localhost:3000/weather/" + city;
@@ -89,8 +108,8 @@ public class ApiApp extends Application {
         }
     }
 
-    public void getPun(String keyword) {
-        String url = "https://punapi.rest/api/pun/search?query=" + keyword;
+    public void getPun(String query) {
+        String url = "https://punapi.rest/api/pun/search?query=" + query;
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .build();
