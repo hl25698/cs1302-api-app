@@ -31,7 +31,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
+ * This app integrates real-time weather from cities with quotes that are related to the city's
+ * weather. THe user can enter the name of any city. When they press the 'Get Weather' button, the
+ * app will display the current weather conditions including temperature, wind speed, and a
+ * description. Based on the weather, the app will display a quote that matches the weather.
  */
 public class ApiApp extends Application {
 
@@ -94,6 +97,11 @@ public class ApiApp extends Application {
 
     } // start
 
+    /**
+     * Sets up the UI for the app.
+     *
+     * @param scene Where the UI will be displayed
+     */
     public void setUp(Scene scene) {
         searchBar.getChildren().addAll(
             new Label("Enter your city:"),
@@ -113,6 +121,12 @@ public class ApiApp extends Application {
         scene.setRoot(root);
     }
 
+    /**
+     * Gets weather information for the inputted city. Displays the information in the UI after
+     * user presses the get weather button.
+     *
+     * @param city The name of the city in order to get the weather
+     */
     public void getWeather(String city) {
         new Thread(() -> {
 //            String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
@@ -152,6 +166,12 @@ public class ApiApp extends Application {
         }).start();
     }
 
+    /**
+     * Formats the weather response into readable format
+     *
+     * @param weather The weather response containing the weather info
+     * @return a formatted string with the weather data
+     */
     private String formatWeatherData(WeatherResponse weather) {
         StringBuilder sb = new StringBuilder();
         sb.append("Current Weather: ").append(weather.getTemperature())
@@ -166,6 +186,12 @@ public class ApiApp extends Application {
         return sb.toString();
     }
 
+    /**
+     * Gets a random quote related to the given keyword. Displays the quote in the UI
+     * after user presses get weather button.
+     *
+     * @param keyword The keyword used to find a quote
+     */
     public void getQuote(String keyword) {
         String baseUrl = "https://api.quotable.io/search/quotes";
         String query = "?query=" + URLEncoder.encode(keyword, StandardCharsets.UTF_8);
@@ -202,6 +228,11 @@ public class ApiApp extends Application {
         }
     }
 
+    /**
+     * Method to handle the rate limit for the APIs. Waits before retrying the request.
+     *
+     * @param response The response containing the rate limit information
+     */
     private void handleRateLimit(HttpResponse<String> response) {
         Optional<String> retryAfter = response.headers().firstValue("retry-after");
         if (retryAfter.isPresent()) {
@@ -215,37 +246,6 @@ public class ApiApp extends Application {
         }
     }
 
-/**
-    public void getPun(String query) {
-        String url = "https://punapi.rest/api/pun/search?query=" + query;
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .build();
-        try {
-            HttpResponse<String> response = HTTP_CLIENT.send(
-                request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Response from Pun API: " + response.body());
-
-            if (response.statusCode() == 200) {
-                Gson gson = new Gson();
-                JokeResponse joke = gson.fromJson(response.body(), JokeResponse.class);
-                if (joke != null && joke.getPun() != null) {
-                    Platform.runLater(() -> {
-                        punInfo.setText(joke.getPun());
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        punInfo.setText("No pun found for the keyword: " + query);
-                    });
-                }
-            } else {
-                Platform.runLater(() -> showAlert("Failed to get pun for: " + query));
-            }
-        } catch (IOException | InterruptedException ie) {
-            Platform.runLater(() -> showAlert("HTTP request failed for URL: " + url, ie));
-        }
-    }
-*/
         /**
      * Shows an alert box with a specific message.
      *
