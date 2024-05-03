@@ -48,6 +48,7 @@ This API's service sometimes returns a 503 status code, meaning the service goes
     It usually goes back up after 5+ minutes. Try using
     curl -IL -X GET 'https://goweather.herokuapp.com/weather/{city}'
     with any city to see whether the API is down or not.
+    Not all cities work as a query (ex. Detroit)
 
 ### API 2
 
@@ -56,7 +57,7 @@ https://api.quotable.io/search/quotes?query=sun
 ```
 
 Rate limit: 180 requests per minute, per IP address
-Only con about this API is that quotes related to weather keywords (sun, wind, etc,) is
+Only con about this API is that quotes related to weather keywords (sun, wind, cloudy, etc) is
     limited.
 
 ## Part 2: New
