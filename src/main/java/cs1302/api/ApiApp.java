@@ -22,6 +22,8 @@ import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
+import java.util.Optional;
+import java.net.http.HttpHeaders;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.Gson;
@@ -50,6 +52,7 @@ public class ApiApp extends Application {
     TextArea weatherInfo;
     TextArea quoteInfo;
     HBox searchBar;
+
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
      * constructor is executed in Step 2 of the JavaFX Application Life-Cycle.
@@ -109,7 +112,8 @@ public class ApiApp extends Application {
 
     public void getWeather(String city) {
         new Thread(() -> {
-            String url = "https://goweather.herokuapp.com/weather/" + city;
+            String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+            String url = "https://goweather.herokuapp.com/weather/" + encodedCity;
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
@@ -169,7 +173,9 @@ public class ApiApp extends Application {
         try {
             HttpResponse<String> response = HTTP_CLIENT.send(
                 request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
+            if (response.statusCode() == 429) {
+                handleRateLimit(response);
+            } else if (response.statusCode() == 200) {
                 Gson gson = new Gson();
                 QuoteResponse quoteResponse = gson.fromJson(response.body(), QuoteResponse.class);
                 if (quoteResponse != null && quoteResponse.results != null &&
@@ -185,6 +191,19 @@ public class ApiApp extends Application {
             }
         } catch (IOException | InterruptedException ex) {
             Platform.runLater(() -> showAlert("HTTP request failed: " + ex.getMessage()));
+        }
+    }
+
+    private void handleRateLimit(HttpResponse<String> response) {
+        Optional<String> retryAfter = response.headers().firstValue("retry-after");
+        if (retryAfter.isPresent()) {
+            try {
+                int wait = Integer.parseInt(retryAfter.get());
+                System.out.println("Rate limit exceeded. Waiting for " + wait + " seconds.");
+                Thread.sleep(wait * 1000);
+            } catch (NumberFormatException | InterruptedException e) {
+                showAlert("Failed to handle 429 status code.");
+            }
         }
     }
 

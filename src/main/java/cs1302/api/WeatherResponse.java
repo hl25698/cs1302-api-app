@@ -43,13 +43,13 @@ public class WeatherResponse {
     public String extractKeyword() {
         String descriptionLower = this.description.toLowerCase();
         if (descriptionLower.contains("sunny")) {
-            return "sunny";
+            return "sun";
         } else if (descriptionLower.contains("rain")) {
-            return "rainy";
+            return "rain";
         } else if (descriptionLower.contains("cloud")) {
-            return "cloudy";
+            return "cloud";
         } else if (descriptionLower.contains("snow")) {
-            return "snowy";
+            return "snow";
         }
         return "weather"; // Default keyword
     }
