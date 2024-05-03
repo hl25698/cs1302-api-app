@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
 import java.util.Optional;
 import java.net.http.HttpHeaders;
+import java.util.Random;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.Gson;
@@ -81,7 +82,7 @@ public class ApiApp extends Application {
         // setup scene
         root.getChildren().addAll(searchBar, banner, notice);
 */
-        this.scene = new Scene(root, 1280, 720);
+        this.scene = new Scene(root, 1280, 500);
         setUp(this.scene);
 
         // setup stage
@@ -104,15 +105,18 @@ public class ApiApp extends Application {
         weatherInfo.setEditable(false);
         quoteInfo = new TextArea();
         quoteInfo.setEditable(false);
+        Label title = new Label("Weather Wit");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         root = new VBox(10);
-        root.getChildren().addAll(searchBar, getWeatherButton, weatherInfo, quoteInfo);
+        root.getChildren().addAll(title, searchBar, getWeatherButton, weatherInfo, quoteInfo);
         root.setAlignment(Pos.TOP_CENTER);
         scene.setRoot(root);
     }
 
     public void getWeather(String city) {
         new Thread(() -> {
-            String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+//            String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+            String encodedCity = city.replace(" ", "-");
             String url = "https://goweather.herokuapp.com/weather/" + encodedCity;
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -178,9 +182,13 @@ public class ApiApp extends Application {
             } else if (response.statusCode() == 200) {
                 Gson gson = new Gson();
                 QuoteResponse quoteResponse = gson.fromJson(response.body(), QuoteResponse.class);
+
                 if (quoteResponse != null && quoteResponse.results != null &&
                     !quoteResponse.results.isEmpty()) {
-                    Quote result = quoteResponse.results.get(0);
+                    Random random = new Random();
+                    int randomIndex = random.nextInt(quoteResponse.results.size());
+                    Quote result = quoteResponse.results.get(randomIndex);
+
                     String quoteText = "\"" + result.content + "\" - " + result.author;
                     Platform.runLater(() -> quoteInfo.setText(quoteText));
                 } else {

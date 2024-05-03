@@ -50,6 +50,8 @@ public class WeatherResponse {
             return "cloud";
         } else if (descriptionLower.contains("snow")) {
             return "snow";
+        } else if (descriptionLower.contains("clear")) {
+            return "clear";
         }
         return "weather"; // Default keyword
     }
