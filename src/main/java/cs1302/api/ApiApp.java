@@ -167,7 +167,7 @@ public class ApiApp extends Application {
     }
 
     /**
-     * Formats the weather response into readable format
+     * Formats the weather response into readable format.
      *
      * @param weather The weather response containing the weather info
      * @return a formatted string with the weather data
